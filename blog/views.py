@@ -4,7 +4,6 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import User, UserManager, Question
 from django.template import RequestContext
-from django.views.generic.edit import FormView
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as authorization
 from django.contrib.auth import logout as deAuthorization
@@ -32,13 +31,21 @@ def paginate(objects_list, request):
 def question_list(request):
 	objects_list = Question.objects.sortByDate()
 	questions = paginate(objects_list, request)
-	context = {'questions' : questions, 'title' : 'Ask Rodya'}
+	context = {'questions' : questions,}
 	return render(request, "blog/post_list.html", context)
+
+
+def hot(request):
+	objects_list = Question.objects.bestQuestions()
+	questions = paginate(objects_list, request)
+	context = {'questions' : questions}
+	return(render(request, "blog/hot.html", context))
 
 
 def question_detail(request, pk):
     question = get_object_or_404(Question, pk=pk)
-    return render(request, 'blog/post_detail.html', {'question': question})
+    context = {'question': question}
+    return render(request, 'blog/post_detail.html', context)
 
 
 def ask(request):
@@ -52,8 +59,8 @@ def ask(request):
 		print (form.errors)
 	else:
 		form = New_question_Form()
-	context = {'title' : 'Ask Rodya', 'form' : form}
-	return(render(request,"blog/ask.html", context))
+	context = {'form' : form}
+	return render(request, "blog/ask.html", context)
 
 
 def signup(request):
@@ -112,32 +119,8 @@ def profile(request):
     return (render(request, "blog/profile.html", context))
 
 
-class LoginFormView(FormView):
-    form_class = AuthenticationForm
-
-    # Аналогично регистрации, только используем шаблон аутентификации.
-    template_name = "blog/signin.html"
-
-    # В случае успеха перенаправим на главную.
-    success_url = "/"
-
-    def form_valid(self, form):
-        # Получаем объект пользователя на основе введённых в форму данных.
-        self.user = form.get_user()
-
-        # Выполняем аутентификацию пользователя.
-        login(self.request, self.user)
-        return super(LoginFormView, self).form_valid(form)
-
 
 def logout(request):
 	print ('user logut')
 	deAuthorization(request)
 	return HttpResponseRedirect('/')
-
-
-def hot(request):
-	objects_list = Question.objects.bestQuestions()
-	questions = paginate(objects_list, request)
-	context = {'questions' : questions, 'title' : 'Ask Rodya'}
-	return(render(request,"blog/hot.html", context))
