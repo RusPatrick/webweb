@@ -47,8 +47,8 @@ class New_question_Form(ModelForm):
 		question.ratin = 0
 		question.asking = user
 		question.save()
-		for tag in data['tags']:
-			question.tags.add(tag)
+		# for tag in data['tags']:
+		# 	question.tags.add(tag)
 		question.save()
 		return question
 
