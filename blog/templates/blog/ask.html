@@ -1,0 +1,16 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+  <div class="card">
+    <div class="card-body">
+      <h4 class="card-title">New question:</h4>
+      <p class="card-text">
+        <form class="bg-white" action="" method="POST">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Ask</button>
+        </form>
+      </p>
+    </div>
+  </div>
+{% endblock content %}

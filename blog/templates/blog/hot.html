@@ -4,10 +4,10 @@
 {% block typequestion %}
 	<ul class="nav nav-tabs">
 		<li class="nav-item">
-			<a class="nav-link active" href="{% url 'question_list' %}"><h4>New questions</h4></a>
+			<a class="nav-link" href="{% url 'question_list' %}"><h4>New questions</h4></a>
 		</li>
 		<li class="nav-item">
-			<a class="nav-link" href="{% url 'hot' %}"><h4>Hot questions</h4></a>
+			<a class="nav-link active" href="{% url 'hot' %}"><h4>Hot questions</h4></a>
 		</li>
 	</ul>
 {% endblock typequestion %}
@@ -26,7 +26,7 @@
 									<td><i class="fas fa-chevron-circle-up"></i></td>
 								</tr>
 								<tr>
-									<td> {{ question.ratin }}</td>
+									<td>{{ question.ratin }}</td>
 								</tr>
 								<tr>
 									<td><i class="fas fa-chevron-circle-down"></i></td>
@@ -54,22 +54,4 @@
 		</div>
 	</div>
 	{% endfor %}
-
-	<div class="pagination mt-2 text-center">
-	  <span class="step-links">
-      {% if questions.has_previous %}
-          <a class="btn btn-primary btn-sm" href="?page=1">&laquo; first</a>
-          <a class="btn btn-primary btn-sm" href="?page={{ questions.previous_page_number }}">previous</a>
-      {% endif %}
-
-      <span class="current">
-          Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
-      </span>
-
-      {% if questions.has_next %}
-          <a class="btn btn-primary btn-sm" href="?page={{ questions.next_page_number }}">next</a>
-          <a class="btn btn-primary btn-sm" href="?page={{ questions.paginator.num_pages }}">last &raquo;</a>
-      {% endif %}
-	  </span>
-	</div>
 {% endblock %}

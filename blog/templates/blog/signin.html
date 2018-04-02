@@ -1,20 +1,20 @@
 {% extends "blog/base.html" %}
 
-{% block title %}Sing up{% endblock %}
+{% block title %}Sign in{% endblock %}
 
 {% block content %}
 
 
 <div class="row justify-content-center">
   <div class="card border-primary mb-3" style="max-width: 18rem;">
-    <div class="card-header">Sing in</div>
+    <div class="card-header">Sign in</div>
     <div class="card-body text-primary">
       <div class="card-text">
         <form class="card-text" action="" method="post">
           {% csrf_token %}
           {{ form.as_p }}
           <div class="row justify-content-center">
-            <button type="submit" class="btn btn-primary">Sing in!</button>
+            <button type="submit" class="btn btn-primary">Sign in!</button>
           </div>
         </form>
       </div>

@@ -3,13 +3,13 @@ from . import views
 
 
 urlpatterns = [
-    url(r'^$', views.post_list, name='post_list'),
-    url(r'^index$', views.post_list, name='index'),
-    url(r'^register/$', views.RegisterFormView.as_view(), name='register'),
-    url(r'^singin/$', views.LoginFormView.as_view(), name='singin'),
-    url(r'ˆlogout/$', views.LogoutView.as_view(), name='logout'),
+    url(r'^$', views.question_list, name='question_list'),
+    url(r'^signup/$', views.signup, name='signup'),
+    url(r'^signin/$', views.login, name='signin'),
+    url(r'^signout/$', views.logout, name='signout'),
+    url(r'^question/(?P<pk>\d+)/$', views.question_detail, name='question_detail'),
+    url(r'^ask/$', views.ask, name='ask'),
+    url(r'^profile/$', views.profile, name='profile'),
+    url(r'^hot/$', views.hot, name='hot'),
+    # url(r'^tag/$', views.)
 ]
-
-
-# if settings.DEBUG:
-#     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

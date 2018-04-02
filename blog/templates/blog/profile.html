@@ -1,0 +1,22 @@
+{% extends "blog/base.html" %}
+
+{% block content %}
+  <form class="" action="" method="post">
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="row mt-2">
+      <div class="col-lg-3">
+        {{ field.label_tag }}
+      </div>
+      <div class="col-lg-9">
+        {{ field }}
+      </div>
+    </div>
+      {% for error in field.errors %}
+          <p style="color: red">{{ error }}</p>
+        {% endfor %}
+    {% endfor %}
+
+    <input type="submit" class="btn btn-primary mt-3" name="" value="Send">
+  </form>
+{% endblock content %}
