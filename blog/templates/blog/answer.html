@@ -1,0 +1,43 @@
+{% load staticfiles %}
+
+<div class="row bg-white border rounded ml-0 mb-2 p-0 w-100">
+
+  <div class="col-2 p-0 border rounded-left ">
+    <table class="h-100 w-100">
+      <tr>
+        <td class="p-0">
+          <div class="centered">
+            <span><img class="avatar-post" src="{% static 'blog/img/man.svg' %}" alt=""></span><br>
+            Ответил:
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  <div class="col-md-10 p-0">
+    <div class="card w-100 m-0 rounded-0">
+      <div class="card-header">
+        <b>{{ answer.answerer }}</b>
+      </div>
+      <div class="card-body">
+        <p class="card-text">
+          {{ answer.text }}
+        </p>
+      </div>
+      <div class="card-footer p-2">
+        <div class="row align-items-center">
+          <div class="col-7">
+            {% if answer.correct %}
+              Correct answer
+            {% else %}
+              <input type="radio" name="correct" data-aid="{{ answer.pk }}" data-qid="{{ question.pk }}" value="correct" class="correct ml-1 mr-2">Correct
+            {% endif %}
+          </div>
+          <div class="col-5">
+            <p class="text-right mb-0">{{ answer.date }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

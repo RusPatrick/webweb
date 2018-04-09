@@ -2,7 +2,7 @@
 {% load staticfiles %}
 
 {% block typequestion %}
-	<ul class="nav nav-tabs">
+	<ul class="nav nav-pills nav-fill">
 		<li class="nav-item">
 			<a class="nav-link active" href="{% url 'question_list' %}"><h4>New questions</h4></a>
 		</li>
@@ -41,35 +41,22 @@
 			<div class="rounded-0 card mt-0">
 				<div class="card-header"> Создан: {{ question.asking }}, {{ question.date }} </div>
 				<div class="card-body">
-					<h4 class="card-title"><a href="{% url 'question_detail' pk=question.pk %}"> {{ question.title }} </a></h4>
+					<h4 class="card-title"><a href="{% url 'question_detail' qid=question.pk %}"> {{ question.title }} </a></h4>
 					<p class="card-text"> {{ question.text }} </p>
 				</div>
 				<div class="card-footer">
 					<div class="row">
-						<div class="col-lg-4 col-xs-5">Answers: </div>
-						<div class="col-lg-8 col-xs-7">Tags: </div>
+						<div class="col-lg-4 col-xs-5">Answers: {{ question.answer.Count }}</div>
+						<div class="col-lg-8 col-xs-7">Tags:
+							{% for tag in question.tags.all %}
+                <a href="#"> {{ tag.text }} </a>
+              {% endfor %}
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	{% endfor %}
-
-	<div class="pagination mt-2 text-center">
-	  <span class="step-links">
-      {% if questions.has_previous %}
-          <a class="btn btn-primary btn-sm" href="?page=1">&laquo; first</a>
-          <a class="btn btn-primary btn-sm" href="?page={{ questions.previous_page_number }}">previous</a>
-      {% endif %}
-
-      <span class="current">
-          Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
-      </span>
-
-      {% if questions.has_next %}
-          <a class="btn btn-primary btn-sm" href="?page={{ questions.next_page_number }}">next</a>
-          <a class="btn btn-primary btn-sm" href="?page={{ questions.paginator.num_pages }}">last &raquo;</a>
-      {% endif %}
-	  </span>
-	</div>
+	{% include "blog/pagination.html" %}
 {% endblock %}

@@ -28,7 +28,6 @@ textarea {
 
 .navbar-brand img{
 	width: 30px;
-	margin:;
 	margin-right: 10px;
 
 }
@@ -63,8 +62,6 @@ textarea {
 	padding-right: 10px;
 	padding-top: 3px;
 	padding-bottom: 3px;
-
-
 }
 
 .workspace {
@@ -75,10 +72,6 @@ textarea {
 	margin: 0 10px;
 }
 
-.register {
-
-}
-
 .helptext {
 	display: none;
 }
@@ -87,7 +80,7 @@ textarea {
 	margin-right: 50px;
 }
 
-input {
+.card form input {
 	border: 1px solid lightgrey;
 	width: 100%;
 }

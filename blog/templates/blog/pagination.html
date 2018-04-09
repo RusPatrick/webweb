@@ -1,0 +1,17 @@
+<div class="pagination mt-2 text-center">
+  <span class="step-links">
+    {% if questions.has_previous %}
+        <a class="btn btn-primary btn-sm" href="?page=1">&laquo; first</a>
+        <a class="btn btn-primary btn-sm" href="?page={{ questions.previous_page_number }}">previous</a>
+    {% endif %}
+
+    <span class="current">
+        Page {{ questions.number }} of {{ questions.paginator.num_pages }}.
+    </span>
+
+    {% if questions.has_next %}
+        <a class="btn btn-primary btn-sm" href="?page={{ questions.next_page_number }}">next</a>
+        <a class="btn btn-primary btn-sm" href="?page={{ questions.paginator.num_pages }}">last &raquo;</a>
+    {% endif %}
+  </span>
+</div>

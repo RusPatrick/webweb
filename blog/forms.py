@@ -4,18 +4,35 @@ from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
 
 
+class New_answer_form(ModelForm):
+	class Meta(object):
+		fieldClass = 'form-control'
+		model = Answer
+		fields = ['text']
+		widgets = {
+			'text': forms.Textarea(attrs={'placeholder': 'input answer\'s text here', 'class': 'new-q-input ' + fieldClass, 'id':"answer-aria"})
+		}
+	def make_answer(self, user, question_id):
+		answer = Answer()
+		answer.answerer = user
+		answer.text = self.cleaned_data['text']
+		answer.correct = False
+		answer.question = Question.objects.get(pk=question_id)
+		answer.save()
+		return answer
+
+
 class New_question_Form(ModelForm):
 	class Meta:
 		fieldClass = 'form-control'
 		model = Question
-		fields = ['title', 'text']
+		fields = ['title', 'text', 'tags']
 		widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'input question here', 'class': 'new-q-input ' + fieldClass}),
             'text': forms.Textarea(attrs={'placeholder': 'input question\'s text here', 'class': 'new-q-input ' + fieldClass}),
-            # 'tags': forms.TextInput(attrs={'placeholder': 'input tag\'s here', 'class': fieldClass}),
         }
 	def clean_tags(self):
-		return [Tag.objects.get(pk=41),]
+		return [Tag.objects.get(pk=Tag.pk),]
 
 	# def __init__(self, *args, **kwargs):
 	# 	if args:
@@ -47,8 +64,8 @@ class New_question_Form(ModelForm):
 		question.ratin = 0
 		question.asking = user
 		question.save()
-		# for tag in data['tags']:
-		# 	question.tags.add(tag)
+		for tag in data['tags']:
+			question.tags.add(tag)
 		question.save()
 		return question
 
@@ -80,6 +97,7 @@ class RegistrationForm(ModelForm):
     class Meta:
         model = User
         fields = ('login', 'nick', 'email', 'password')
+
 
     def save(self):
         data = self.cleaned_data
@@ -135,10 +153,10 @@ class LoginForm(forms.Form):
     def password_is_valid(self):
         user = User.objects.get(username=self.cleaned_data['login'])
         if user.check_password(self.cleaned_data['password']):
-            print("passwod valid")
+            print("password valid")
             return True
         else:
-            print("passwod not valid")
+            print("password not valid")
             return False
 
     def log_in(self):

@@ -12,8 +12,8 @@
       <div class="card-text">
         <form method="post">
           {% csrf_token %}
-          {{ form.as_p }}
-          <input type="submit" class="btn btn-primary" name="" value="Send">
+          {{ form.as_table }}
+          <input type="submit" class="btn btn-primary mt-3" name="" value="Send">
         </form>
       </div>
     </div>
