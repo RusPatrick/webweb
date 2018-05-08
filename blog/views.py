@@ -3,17 +3,17 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 import re
-from .models import User, UserManager, Question, Answer
+from .models import Profile, UserManager, Question, Answer
 from django.template import RequestContext
+from django.core.exceptions import ValidationError
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as authorization
 from django.contrib.auth import logout as deAuthorization
 from django.http import HttpResponseRedirect
 from django.http.response import JsonResponse
 from django.views.generic.base import View
-from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .forms import New_question_Form, New_answer_form, ProfileForm, LoginForm, RegistrationForm
+from .forms import New_question_Form, New_answer_form, ProfileForm, SignInForm, RegistrationForm
 from django.shortcuts import redirect
 import datetime
 from django.views.generic.edit import FormView
@@ -31,7 +31,7 @@ def paginate(objects_list, request):
 
 
 def question_list(request):
-	objects_list = Question.objects.sortByDate()
+	objects_list = Question.objects.newest()
 	questions = paginate(objects_list, request)
 	context = {'questions' : questions,}
 	return render(request, "blog/post_list.html", context)
@@ -91,40 +91,29 @@ def ask(request):
 	return render(request, "blog/ask.html", context)
 
 
+def signin(request):
+	if request.user.is_authenticated:
+		return redirect(request.GET.get('next', 'index'))
+	else:
+		return auth_views.login(request, template_name='blog/login.html', authentication_form=LoginForm)
+
+
 def signup(request):
-    if request.method == "POST":
-        form = RegistrationForm(request.POST, request.FILES)
-        print(form)
-        if form.is_valid():
-            # TODO: create user
-            user = form.save()
-            authorization(request, user)
-            print('register success')
-            return redirect('profile')
-        print('Save not success')
-        print(form.errors)
-    else:
-        form = RegistrationForm()
-    context = {'title': 'Ask Rodya', 'form': form}
-    return render(request, "blog/register.html", context)
-
-
-def login(request):
-    # if request.user.is_authenticated():
-    # return redirect('personal_page')
-    if request.method == "POST":
-        form = LoginForm(request.POST, request.FILES)
-        print(form)
-        if form.is_valid() and form.log_in():
-            user = User.objects.get(username=form.cleaned_data['login'])
-            print("login success")
-            authorization(request, user)
-            return redirect('profile')
-        else:
-            print(form.errors)
-    form = LoginForm()
-    context = {'title': 'Ask Rodya', 'form': form}
-    return render(request, "blog/signin.html", context)
+	if request.method == "GET" and request.user.is_authenticated:
+		return redirect('index')
+	form = RegistrationForm(request.POST or None, request.FILES or None)
+	if request.method == 'POST':
+		if form.is_valid():
+			form.save()
+			user = authenticate(
+				request,
+				username=form.cleaned_data.get('username'),
+				password=form.cleaned_data.get('password1')
+			)
+			authorization(request, user)
+			return redirect('index')
+	context = {'form': form}
+	return render(request, 'blog/register.html', context)
 
 
 @login_required(login_url='signin')
@@ -205,13 +194,3 @@ def correct(request):
         aid = int(request.POST.get('aid'))
     except:
         return JsonResponse(dict(error='bad answer id'))
-
-
-class RegistForm(FormView):
-    form_class = RegistrationForm
-    success_url = "/signin/"
-    template_name = "blog/register.html"
-
-    def form_valid(self, form):
-         user = form.save()
-         return super(RegistForm, self).form_valid(form)

@@ -1,94 +1,221 @@
+from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import AbstractUser, UserManager
 
 
+
+class UserManager(UserManager):
+    def by_username(self, _username):
+        return get_object_or_404(self, username=_username)
+
+    def by_id(self, _id):
+        return get_object_or_404(self, pk=_id)
+
+    def by_rating(self):
+        return self.order_by('-rating')
+
+    def search(self, _q):
+        return self.filter(username__icontains=_q).order_by('-rating')
+
+
 class QuestionManager(models.Manager):
-    def sortByDate(self):
-        objects_list = []
-        questions = self.order_by('-date')
-        for question in questions:
-            list_element = question
-            list_element.answers_count = Answer.objects.filter(question_id=question.id).count()  #просто question.answer.count в швблоне
-            objects_list.append(list_element)
-        return objects_list
+    def newest(self):
+        return self.all()
 
-    def bestQuestions(self):
-        objects_list = []
-        questions = self.order_by('-ratin')
-        for question in questions:
-            list_element = question
-            list_element.answers_count = Answer.objects.filter(question_id=question.id).count()
-            objects_list.append(list_element)
-        return objects_list
+    def hottest(self):
+        return self.order_by('-rating')
 
-    def questionsByTag(self, tag):
-        return Question.objects.filter(tags__text=tag)
+    def by_id(self, _id):
+        return get_object_or_404(self, pk=_id)
 
-
-class UserM(UserManager):
-    def bestUsers(self):
-        return User.objects.annotate(total=Count('author')).order_by("-total")[:5]
+    def search(self, _q):
+        return self.filter(tags__name__icontains=_q).order_by('-rating')
+        # return self.filter(Q(title__icontains=q) | Q(text__icontains=q))
 
 
 class AnswerManager(models.Manager):
-    def answersOnQuestion(self, id):
-        return Answer.objects.filter(question_id=id)
+    def hottest(self, qid):
+        return self.filter(question__id=qid).order_by('-rating', '-creationTime')
 
-    def bestAnswers(self):
-        objects_list = []
-        answers = self.order_by('correct')
-        for answer in answers:
-            list_element = answer
-            list_element.answers_count = Answer.objects.filter(answer_id=answer.id).count()
-            objects_list.append(list_element)
-        return objects_list
+class LikeManager(models.Manager):
+    pass
 
 
 class TagManager(models.Manager):
-    def bestTags(self):
-        return Tag.objects.annotate(total=Count('tags')).order_by("-total")[:5]
+    def by_tag_newest(self, _tag):
+        return get_object_or_404(self, name=_tag).questions.all().order_by('-creationTime')
+
+    def hottest(self):
+        return self.annotate(question_count=Count('questions')).order_by('-question_count')
+
+    def search(self, _q):
+        return self.hottest().filter(name__icontains=_q)
 
 
-class User(AbstractUser):
-    # avatar = models.ImageField(upload_to='user_pics/%Y/%m/%d/', default='user_pics/man.svg')
-    nick = models.CharField(max_length=20)
-    objects = UserM()
+class Profile(AbstractUser):
+    avatar = models.ImageField(
+        blank=False,
+        default="user_pics/boss-1.png",
+        upload_to='uploads/%Y/%m/%d',
+        verbose_name="Avatar image of the user"
+    )
+    rating = models.IntegerField(default=0, verbose_name="Rating of the user")
+    objects = UserManager()
+
+    def get_objects(self):
+        return self.questions.order_by('-creationTime')
+
+    def get_answer(self):
+        return self.answers.order_by('-creationTime')
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        ordering = ['-rating']
 
 
 class Tag(models.Model):
-    text = models.CharField(max_length=200)
+    name = models.CharField(max_length=15, verbose_name="Name of the tag")
+
     objects = TagManager()
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+class Like(models.Model):
+    LIKE = 1
+    DISLIKE = -1
+    VALUES = ((DISLIKE, 'DISLIKE'), (LIKE, 'LIKE'))
+    author = models.ForeignKey (
+        Profile,
+        null = False,
+        verbose_name = "Author of the like",
+        on_delete = models.CASCADE
+    )
+
+    value = models.IntegerField (
+        choices = VALUES,
+        verbose_name = "Like or dislike",
+        null = False
+    )
+
+    content_type = models.ForeignKey (
+        ContentType,
+        on_delete = models.CASCADE,
+        null = True
+    )
+
+    object_id = models.PositiveIntegerField (
+        null = True,
+        verbose_name = "if of related object"
+    )
+
+    content_object = GenericForeignKey ('content_type', 'object_id')
+
+    objects = LikeManager()
+
+    def __str__(self):
+        return str(self.value) + 'from' + self.author.username
+
+    class Meta:
+        unique_together = ('author', 'content_type', 'object_id')
+
+
+class Question(models.Model):
+    author = models.ForeignKey(
+        Profile,
+        null = False,
+        verbose_name = "Author of the Quetstion",
+        on_delete = models.CASCADE,
+        related_name = 'questions'
+    )
+
+    title = models.CharField ( max_length = 120, verbose_name = "Title of the question")
+    text = models.TextField ()
+    tags = models.ManyToManyField (
+        Tag,
+        blank = True,
+        verbose_name = "tags of the Question",
+        related_name = 'questions'
+    )
+    creationTime = models.DateTimeField (
+        default = timezone.now,
+        verbose_name = "Creation date of the question"
+    )
+    likes = GenericRelation(Like, related_query_name = "questions")
+    rating = models.IntegerField(default=0, verbose_name="Votes ratio")
+
+    objects = QuestionManager()
+
+    def is_answered_by(self, user):
+        return self.answer_set.filter(author=user).exists()
+
+    def update_rating(self):
+        # print('Update_rating fired!')
+        like_count = self.likes.filter(value=1).count()
+        dislike_count = self.likes.filter(value=-1).count()
+        self.rating = like_count - dislike_count
+        self.save(update_fields=['rating'])
 
     def __str__(self):
         return self.text
 
-
-class Question(models.Model):
-    asking = models.ForeignKey(User, on_delete=models.CASCADE, related_name="author")
-    title = models.CharField(max_length=200)
-    text = models.TextField()
-    ratin = models.IntegerField(default=0)
-    tags = models.ManyToManyField(Tag, related_name="tags")
-    date = models.DateTimeField(default=timezone.now)
-    objects = QuestionManager()
-
-    def __str__(self):
-        return self.title
+    class Meta:
+        ordering = ['-creationTime']
 
 
 class Answer(models.Model):
-    answerer = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    text = models.TextField()
-    correct = models.BooleanField()
-    date = models.DateTimeField(default=timezone.now)
+    author = models.ForeignKey(
+        Profile,
+        null=False,
+        verbose_name="Author of the answer",
+        on_delete=models.CASCADE,
+        related_name='answers'
+    )
+    question = models.ForeignKey(
+    Question,
+        null=False,
+        on_delete=models.CASCADE,
+        verbose_name="Question that is being answered"
+    )
+
+    text = models.TextField(verbose_name="Full text of the answer")
+    creationTime = models.DateTimeField(
+        default=timezone.now,
+        verbose_name="Date and time the answer was published"
+    )
+
+    likes = GenericRelation(Like, related_query_name='answers')
+    rating = models.IntegerField(default=0, verbose_name="Votes ratio")
+    is_correct = models.BooleanField(
+        default=False,
+        verbose_name="If answer is marked as correct"
+    )
+
     objects = AnswerManager()
 
+    def get_page(self):
+        return int(Answer.objects.hottest(self.question.id).filter(rating__gte=self.rating).filter(creationTime__lte=self.creationTime).count() / 30) + 1
 
+    def update_rating(self):
+        # print('Update_rating fired!')
+        like_count = self.likes.filter(value=1).count()
+        dislike_count = self.likes.filter(value=-1).count()
+        self.rating = like_count - dislike_count
+        self.save(update_fields=['rating'])
 
-class Like(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    assessment = models.SmallIntegerField();
-    date = models.DateTimeField(auto_now=True)
+    def __str__(self):
+        return self.text
+
+    class Meta:
+        ordering = ['-creationTime']
+        # unique_together = ('author', 'question')
