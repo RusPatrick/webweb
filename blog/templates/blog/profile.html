@@ -13,7 +13,7 @@
   <img src="{{ profile.avatar.url }}" alt="avatar" height="42" width="42" class="rounded-circle">
   {{ profile.username }}
   {% if user == profile %}
-    [<a href="{% url 'editProfile' %}">Edit profile</a>]
+    <a class="btn btn-outline-primary" style="font-size: 25px" href="{% url 'editProfile' %}"> <i class="fas fa-cog"></i> </a>
   {% endif %}
   {% if user.is_authenticated and user != profile %}
     {% is_liked_by_current_user profile as like %}

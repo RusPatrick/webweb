@@ -1,62 +1,34 @@
 {% extends "blog/base.html" %}
-{% load staticfiles %}
+{% load static %}
 
-{% block typequestion %}
-	<ul class="nav nav-pills nav-fill">
-		<li class="nav-item">
-			<a class="nav-link active" href="{% url 'question_list' %}"><h4>New questions</h4></a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" href="{% url 'hot' %}"><h4>Hot questions</h4></a>
-		</li>
-	</ul>
-{% endblock typequestion %}
+{% block title %}
+  {{ tab|title }} Questions
+{% endblock title %}
 
 {% block content %}
-	{% for question in questions %}
-	<div class="question row bg-white border rounded">
-		<div class="col-2 p-0 border rounded-left ">
-			<table class="h-100 w-100">
-				<tr>
-					<td>
-						<div class="centered">
-							<span><img class="avatar-post align-middle" src="{% static 'blog/img/man.svg' %}" alt=""></span><br>
-							<table class="m-auto">
-								<tr>
-									<td><i class="fas fa-chevron-circle-up"></i></td>
-								</tr>
-								<tr>
-									<td> {{ question.ratin }}</td>
-								</tr>
-								<tr>
-									<td><i class="fas fa-chevron-circle-down"></i></td>
-								</tr>
-							</table>
-						</div>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div class="col-10 p-0">
-			<div class="rounded-0 card mt-0">
-				<div class="card-header"> Создан: {{ question.asking }}, {{ question.date }} </div>
-				<div class="card-body">
-					<h4 class="card-title"><a href="{% url 'question_detail' qid=question.pk %}"> {{ question.title }} </a></h4>
-					<p class="card-text"> {{ question.text }} </p>
-				</div>
-				<div class="card-footer">
-					<div class="row">
-						<div class="col-lg-4 col-xs-5">Answers: {{ question.answer.Count }}</div>
-						<div class="col-lg-8 col-xs-7">Tags:
-							{% for tag in question.tags.all %}
-                <a href="#"> {{ tag.text }} </a>
-              {% endfor %}
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	{% endfor %}
-	{% include "blog/pagination.html" %}
-{% endblock %}
+
+{% if tab == 'new' %}
+  <div class="container mb-4 mt-4">
+    <nav class="nav nav-pills nav-justified">
+      <a class="nav-item nav-link border rounded active" href="{% url 'index' %}">New questions</a>
+      <a class="nav-item nav-link border rounded" href="{% url 'hot' %}">Hot questions</a>
+    </nav>
+  </div>
+{% else %}
+  <div class="container mb-4 mt-4">
+    <nav class="nav nav-pills nav-justified">
+      <a class="nav-item nav-link border rounded" href="{% url 'index' %}">New questions</a>
+      <a class="nav-item nav-link border rounded active" href="{% url 'hot' %}">Hot questions</a>
+    </nav>
+  </div>
+{% endif %}
+
+{% for question in questions %}
+  {% include "blog/question_template.html" %}
+{% endfor %}
+
+{% endblock content %}
+
+{% block pagination %}
+  {% include "blog/pagination.html" %}
+{% endblock pagination %}

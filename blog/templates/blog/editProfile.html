@@ -1,4 +1,4 @@
-{% extends "qSite/base.html" %}
+{% extends "blog/base.html" %}
 {% load static %}
 
 {% block title %}
@@ -53,6 +53,9 @@
           <div class="invalid-feedback">{{ error }}</div>
         {% endfor %}
       {% endif %}
+    </div>
+    <div class="offset-md-2 col-md-3">
+      <img src="{{ user.avatar.url }}" class="float-right border border-primary" width="90px" height="90px" alt="">
     </div>
   </div>
 

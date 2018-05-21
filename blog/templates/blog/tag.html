@@ -1,7 +1,20 @@
 {% extends "blog/base.html" %}
+{% load static %}
 
-{% block title %}{{ tag.text }}{% endblock title %}
+{% block title %}
+  {{ tag }}
+{% endblock title %}
 
 {% block content %}
-  
+<h1>{{ tag }}</h1>
+<hr>
+
+{% for question in questions %}
+  {% include "blog/question_template.html" %}
+{% endfor %}
+
 {% endblock content %}
+
+{% block pagination %}
+  {% include "blog/pagination.html" %}
+{% endblock pagination %}

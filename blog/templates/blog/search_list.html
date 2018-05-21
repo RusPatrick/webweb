@@ -1,0 +1,57 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}
+  {{ q }}
+{% endblock title %}
+
+{% block content %}
+<h1>Search results</h1>
+<hr>
+<div class="container mb-4 mt-4">
+<ul class="nav nav-pills nav-justified" id="searchTab" role="tablist">
+  <li class="nav-item border rounded">
+    <a class="nav-link active" id="tags-tab" data-toggle="tab" href="#tags" role="tab" aria-controls="tags" aria-selected="true">Tags</a>
+  </li>
+  <li class="nav-item border rounded">
+    <a class="nav-link" id="questions-tab" data-toggle="tab" href="#questions" role="tab" aria-controls="questions" aria-selected="false">Questions</a>
+  </li>
+  <li class="nav-item border rounded">
+    <a class="nav-link" id="users-tab" data-toggle="tab" href="#users" role="tab" aria-controls="users" aria-selected="false">Users</a>
+  </li>
+</ul>
+</div>
+<div class="tab-content" id="searchTabContent">
+  <div class="tab-pane fade show active" id="tags" role="tabpanel" aria-labelledby="tags-tab">
+    {% if not tags %}
+      <h3>No tags found.</h3>
+    {% endif %}
+    {% for tag in tags %}
+      <a href="{% url 'tag' tag.name %}">{{ tag.name }}</a> - {{ tag.question_count }} questions<hr>
+    {% endfor %}
+  </div>
+  <div class="tab-pane fade" id="users" role="tabpanel" aria-labelledby="users-tab">
+    {% if not users %}
+      <h3>No users found.</h3>
+    {% endif %}
+    {% for profile in users %}
+      <a href="{% url 'profile' profile.id %}"><img src="{{ profile.avatar.url }}" alt="avatar" height="42" width="42" class="rounded-circle"></a>
+      <a href="{% url 'profile' profile.id %}">{{ profile.username }}</a>
+      {% if profile.rating >= 0 %}
+        <span class="text-success">{{ profile.rating }}</span>
+      {% else %}
+        <span class="text-danger">{{ profile.rating }}</span>
+      {% endif %}
+      <hr>
+    {% endfor %}
+  </div>
+  <div class="tab-pane fade" id="questions" role="tabpanel" aria-labelledby="questions-tab">
+    {% if not questions %}
+      <h3>No questions found.</h3>
+    {% endif %}
+    {% for question in questions %}
+      {% include "blog/question_template.html" %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock content %}

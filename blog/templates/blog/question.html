@@ -1,0 +1,42 @@
+{% extends "blog/base.html" %}
+{% load static %}
+
+{% block title %}
+  {{ question.title }}
+{% endblock title %}
+
+{% block content %}
+
+<h1>Question</h1>
+<hr>
+{% include "blog/question_template.html" %}
+<h1 class="mt-2">{{ page.paginator.count }} Answers</h1>
+<hr>
+<!-- response -->
+{% for answer in answers %}
+  {% include "blog/answer_template.html" %}
+{% endfor %}
+
+<!-- Users' response -->
+{% if user.is_authenticated and question.author != user and form is not None %}
+  <h1 id="answer_field" class="mt-2">Your answer</h1>
+  <hr>
+  <form method="post" action="{% url 'question' question.id %}#answer_field" novalidate>
+    {% csrf_token %}
+    <div class="form-group">
+      <!-- <textarea class="form-control" id="user_answer_text" rows="5" required></textarea> -->
+      {{ form.text }}
+      {% if form.text.errors %}
+        {% for error in form.text.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+    <button type="submit" class="btn btn-primary">Post your answer</button>
+  </form>
+{% endif %}
+
+{% endblock content %}
+{% block pagination %}
+  {% include "blog/pagination.html" %}
+{% endblock pagination %}

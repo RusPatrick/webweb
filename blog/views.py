@@ -8,11 +8,9 @@ from .models import *
 from .forms import *
 from django.template import RequestContext
 from django.core.exceptions import ValidationError
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponseRedirect
-from django.http.response import JsonResponse
+from django.http import HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.views.generic.base import View
 from django.core.paginator import Paginator, EmptyPage
 from django.shortcuts import redirect
@@ -35,13 +33,6 @@ def paginate(request, objects_list, limit):
     page = paginator.get_page(paginator.num_pages)
 
   return page
-
-
-def question_list(request):
-	objects_list = Question.objects.newest()
-	questions = paginate(objects_list, request)
-	context = {'questions' : questions,}
-	return render(request, "blog/post_list.html", context)
 
 
 def index(request):
@@ -201,3 +192,14 @@ def correct(request):
   answer.is_correct = not state
   answer.save()
   return JsonResponse({'status': 'ok', 'is_correct': answer.is_correct})
+
+
+def search(request):
+  q = request.GET.get('q')
+  if q == '':
+    return redirect(request.GET.get('back_path'))
+  tags = Tag.objects.search(q)
+  users = Profile.objects.search(q)
+  questions = Question.objects.search(q)
+  context = {'q': q, 'tags': tags, 'users': users, 'questions': questions}
+  return render(request, 'blog/search_list.html', context)

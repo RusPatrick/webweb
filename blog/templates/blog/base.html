@@ -46,12 +46,12 @@
       <div class="user user-mob">
         <div class="username">
           <button class="btn usr-btn btn-outline-primary btn-sm" type="button" data-toggle="collapse" data-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
-            <img class="avatar" src="{% static "blog/img/man.svg" %}" alt=""> {{ user.get_username }}
+            <img class="avatar rounded-circle" src="{{ user.avatar.url }}" alt=""> {{ user.get_username }}
           </button>
           <div class="collapse" id="collapseExample">
             <div class="card card-body">
               <a class="dropdown-item" href="{% url 'profile' user.id%}">Profile</a>
-              <a class="dropdown-item" href="#">Settings</a>
+              <a class="dropdown-item" href="{% url 'editProfile' %}">Settings</a>
               <a class="dropdown-item" href="{% url 'signout' %}">Sign out</a>
             </div>
           </div>
@@ -61,11 +61,11 @@
 
       <div class="btn-group user user-pc">
         <button type="button" class="btn btn-outline-primary dropdown-toggle no-padding" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            <img class="avatar" src="{% static "blog/img/man.svg" %}" alt=""> {{ user.get_username }}
+            <img class="avatar rounded-circle" src="{{ user.avatar.url }}" alt=""> {{ user.get_username }}
         </button>
         <div class="dropdown-menu margin-right">
            <a class="dropdown-item" href="{% url 'profile' user.id%}">Profile</a>
-            <a class="dropdown-item" href="#">Settings</a>
+            <a class="dropdown-item" href="{% url 'editProfile' %}">Settings</a>
             <a class="dropdown-item" href="{% url 'signout' %}">Sign out</a>
         </div>
       </div>
@@ -125,5 +125,6 @@
   <script src="{% static "blog/js/popper.min.js" %}" crossorigin="anonymous"></script>
   <script src="{% static "blog/js/bootstrap.min.js" %}" crossorigin="anonymous"></script>
   <script src="{% static "blog/js/fontawesome.min.js" %}" crossorigin="anonymous"></script>
+  <script src="{% static "blog/js/blog.js" %}" crossorigin="anonymous"></script>
 </body>
 </html>
