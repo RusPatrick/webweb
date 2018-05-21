@@ -1,0 +1,87 @@
+{% load static %}
+{% load is_liked_by_current_user %}
+
+<div class="row" id="question{{ question.id }}">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <a href="{% url 'profile' question.author.id %}"><img src="{{ question.author.avatar.url }}" alt="avatar" height="42" width="42" class="rounded-circle"></a>
+        <a href="{% url 'profile' question.author.id %}">{{ question.author.username }}</a>
+        <span class="text-muted"> asks about:</span>
+
+        {% if answers.count >= 0 and user.is_authenticated and question.author != user and form is not None %}
+          <button type="button" class="float-right btn btn-link"><a href="#answer_field">Answer this question</a></button>
+        {% endif %}
+
+        <hr>
+        <a href="{% url 'question' question.id %}"><h5 class="card-title">{{ question.title }}</h5></a>
+      </div>
+      <div class="card-body">
+        <p class="card-text">
+          {% if answers %}
+            {{ question.text }}
+          {% else %}
+            {{ question.text|truncatechars:150 }}
+          {% endif %}
+        </p>
+      </div>
+      <div class="card-footer text-muted">Posted {{ question.creationTime|timesince }} ago, tags:
+        {% for tag in question.tags.all %}
+          <a href="{% url 'tag' tag.name %}">{{ tag.name }}</a>
+        {% endfor %}
+        {% if user.is_authenticated and user != question.author %}
+          {% is_liked_by_current_user question as like %}
+          {% if like == 0 %}
+            <button type="button" data-toggle="button" class="btn btn-outline-danger btn-sm float-right mr-2 js-like" data-id="{{ question.id }}" data-content_type="Question" data-value="-1">
+              <i class="far fa-thumbs-down"></i>
+            </button>
+
+            {% if question.rating >= 0 %}
+              <button type="button" class="btn btn-light btn-sm float-right mr-2 text-success" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+            {% else %}
+              <button type="button" class="btn btn-light btn-sm float-right mr-2 text-danger" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+            {% endif %}
+
+            <button type="button" data-toggle="button" class="btn btn-outline-success btn-sm float-right mr-2 js-like" data-id="{{ question.id }}" data-content_type="Question" data-value="1">
+              <i class="far fa-thumbs-up"></i>
+            </button>
+          {% elif like == 1 %}
+            <button type="button" data-toggle="button" class="btn btn-outline-danger btn-sm float-right mr-2 js-like" data-id="{{ question.id }}" data-content_type="Question" data-value="-1">
+              <i class="far fa-thumbs-down"></i>
+            </button>
+
+            {% if question.rating >= 0 %}
+              <button type="button" class="btn btn-light btn-sm float-right mr-2 text-success" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+            {% else %}
+              <button type="button" class="btn btn-light btn-sm float-right mr-2 text-danger" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+            {% endif %}
+
+            <button type="button" data-toggle="button" class="btn btn-outline-success btn-sm float-right mr-2 active js-like" data-toggle="button" aria-pressed="true" autocomplete="off" data-id="{{ question.id }}" data-content_type="Question" data-value="1">
+              <i class="far fa-thumbs-up"></i>
+            </button>
+          {% else %}
+            <button type="button" data-toggle="button" class="btn btn-outline-danger btn-sm float-right mr-2 active js-like" data-toggle="button" aria-pressed="true" autocomplete="off" data-id="{{ question.id }}" data-content_type="Question" data-value="-1">
+              <i class="far fa-thumbs-down"></i>
+            </button>
+
+            {% if question.rating >= 0 %}
+              <button type="button" class="btn btn-light btn-sm float-right mr-2 text-success" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+            {% else %}
+              <button type="button" class="btn btn-light btn-sm float-right mr-2 text-danger" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+            {% endif %}
+
+            <button type="button" data-toggle="button" class="btn btn-outline-success btn-sm float-right mr-2 js-like" data-id="{{ question.id }}" data-content_type="Question" data-value="1">
+              <i class="far fa-thumbs-up"></i>
+            </button>
+          {% endif %}
+        {% else %}
+          {% if question.rating >= 0 %}
+            <button type="button" class="btn btn-light btn-sm float-right mr-2 text-success" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+          {% else %}
+            <button type="button" class="btn btn-light btn-sm float-right mr-2 text-danger" id="Question_likes_count-{{ question.id }}">{{ question.rating }}</button>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>

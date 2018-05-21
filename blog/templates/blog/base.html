@@ -12,12 +12,16 @@
   <link rel="stylesheet" href="{% static "blog/css/main.css" %}" crossorigin="anonymous">
   <link rel="stylesheet" href="{% static "blog/css/fontawesome-all.css" %}">
 
-  <title>{% block title %}Blog{% endblock title %}</title>
+  <title>
+    {% block title %}
+    Blog
+    {% endblock title %}
+  </title>
 </head>
 <body>
 
   <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-primary">
-    <a class="navbar-brand" href="{% url 'question_list' %}"><img src="{% static "blog/img/teamwork.svg" %}" alt="">Ask_Rodya</a>
+    <a class="navbar-brand" href="{% url 'index' %}"><img src="{% static "blog/img/teamwork.svg" %}" alt="">Ask_Rodya</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -46,7 +50,7 @@
           </button>
           <div class="collapse" id="collapseExample">
             <div class="card card-body">
-              <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+              <a class="dropdown-item" href="{% url 'profile' user.id%}">Profile</a>
               <a class="dropdown-item" href="#">Settings</a>
               <a class="dropdown-item" href="{% url 'signout' %}">Sign out</a>
             </div>
@@ -60,7 +64,7 @@
             <img class="avatar" src="{% static "blog/img/man.svg" %}" alt=""> {{ user.get_username }}
         </button>
         <div class="dropdown-menu margin-right">
-           <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+           <a class="dropdown-item" href="{% url 'profile' user.id%}">Profile</a>
             <a class="dropdown-item" href="#">Settings</a>
             <a class="dropdown-item" href="{% url 'signout' %}">Sign out</a>
         </div>
@@ -75,8 +79,6 @@
   <main role="main">
     <div class="workspace row justify-content-center">
       <div class="col-lg-8 col-xs-11 phone-margin">
-        {% block typequestion %}
-        {% endblock typequestion %}
         {% block content %}
         {% endblock content %}
       </div>

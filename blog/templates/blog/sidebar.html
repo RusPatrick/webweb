@@ -7,15 +7,12 @@
   </div>
 </div>
 <div class="card members">
-	<h4 class="card-header text-center">Активные пользватели</h4>
-	<div class="container">
-		<ul style="list-style: none;">
-      <li><img class="avatar mr-1 mt-1"src="{% static 'blog/img/man.svg' %}" alt=""><a href="{% url 'profile' %}">Username</a></li>
-      <li><img class="avatar mr-1 mt-1"src="{% static 'blog/img/man.svg' %}" alt=""><a href="{% url 'profile' %}">Username</a></li>
-      <li><img class="avatar mr-1 mt-1"src="{% static 'blog/img/man.svg' %}" alt=""><a href="{% url 'profile' %}">Username</a></li>
-      <li><img class="avatar mr-1 mt-1"src="{% static 'blog/img/man.svg' %}" alt=""><a href="{% url 'profile' %}">Username</a></li>
-      <li><img class="avatar mr-1 mt-1"src="{% static 'blog/img/man.svg' %}" alt=""><a href="{% url 'profile' %}">Username</a></li>
-
-    </ul>
-	</div>
+  <ul class="list-group" >
+    <li class="list-group-item active">Best Members</li>
+    {% for user in top_users %}
+      <li class="list-group-item">
+        <a href="{% url 'profile' user.id %}">{{ user.username }}</a>
+      </li>
+    {% endfor %}
+  </ul>
 </div>

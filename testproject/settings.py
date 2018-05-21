@@ -63,6 +63,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                "blog.context_processors.add_tags_users_to_context",
             ],
         },
     },
@@ -80,8 +81,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
-AUTH_USER_MODEL='blog.Profile'
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -123,5 +122,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'mainapp/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'blog/media')
 MEDIA_URL = '/media/'
+
+AUTH_USER_MODEL = 'blog.Profile'
+LOGIN_REDIRECT_URL = 'index'

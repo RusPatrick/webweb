@@ -1,0 +1,66 @@
+{% extends "qSite/base.html" %}
+{% load static %}
+
+{% block title %}
+  edit {{ profile.username }}
+{% endblock title %}
+
+{% block content %}
+<h1>Edit profile</h1>
+<hr>
+<form method="post" action="{% url 'editProfile' %}" enctype="multipart/form-data" novalidate>
+  {% csrf_token %}
+
+  {% for error in form.non_field_errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      {{ error }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endfor %}
+
+  <div class="form-group row">
+    <label for="{{ form.username.id_for_label }}" class="col-md-2 col-form-label">Login</label>
+    <div class="col-md-5">
+      {{ form.username }}
+      {% if form.username.errors %}
+        {% for error in form.username.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="{{ form.email.id_for_label }}" class="col-md-2 col-form-label">Email</label>
+    <div class="col-md-5">
+      {{ form.email }}
+      {% if form.email.errors %}
+        {% for error in form.email.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="{{ form.avatar.id_for_label }}" class="col-md-2 col-form-label">Upload Avatar</label>
+    <div class="col-md-5">
+      {{ form.avatar }}
+      {% if form.avatar.errors %}
+        {% for error in form.avatar.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-2"></div>
+    <div class="col-md-5">
+      <button type="submit" class="btn btn-secondary">Edit</button>
+    </div>
+  </div>
+</form>
+{% endblock content %}

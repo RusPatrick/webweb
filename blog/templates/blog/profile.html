@@ -1,22 +1,101 @@
 {% extends "blog/base.html" %}
+{% load static %}
+
+{% load is_liked_by_current_user %}
+
+{% block title %}
+  {{ profile.username }}
+{% endblock title %}
 
 {% block content %}
-  <form class="" action="" method="post">
-    {% csrf_token %}
-    {% for field in form %}
-    <div class="row mt-2">
-      <div class="col-lg-3">
-        {{ field.label_tag }}
-      </div>
-      <div class="col-lg-9">
-        {{ field }}
-      </div>
-    </div>
-      {% for error in field.errors %}
-          <p style="color: red">{{ error }}</p>
-        {% endfor %}
-    {% endfor %}
 
-    <input type="submit" class="btn btn-primary mt-3" name="" value="Send">
-  </form>
+<h1>
+  <img src="{{ profile.avatar.url }}" alt="avatar" height="42" width="42" class="rounded-circle">
+  {{ profile.username }}
+  {% if user == profile %}
+    [<a href="{% url 'editProfile' %}">Edit profile</a>]
+  {% endif %}
+  {% if user.is_authenticated and user != profile %}
+    {% is_liked_by_current_user profile as like %}
+
+    {% if like == 0 %}
+      <button type="button" data-toggle="button" class="btn btn-outline-danger btn-lg float-right mr-2 js-like" data-id="{{ profile.id }}" data-content_type="Profile" data-value="-1">
+        <i class="far fa-thumbs-down"></i>
+      </button>
+
+      {% if profile.rating >= 0 %}
+        <button type="button" class="btn btn-light btn-lg float-right mr-2 text-success" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+      {% else %}
+        <button type="button" class="btn btn-light btn-lg float-right mr-2 text-danger" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+      {% endif %}
+
+      <button type="button" data-toggle="button" class="btn btn-outline-success btn-lg float-right mr-2 js-like" data-id="{{ profile.id }}" data-content_type="Profile" data-value="1">
+        <i class="far fa-thumbs-up"></i>
+      </button>
+    {% elif like == 1 %}
+      <button type="button" data-toggle="button" class="btn btn-outline-danger btn-lg float-right mr-2 js-like" data-id="{{ profile.id }}" data-content_type="Profile" data-value="-1">
+        <i class="far fa-thumbs-down"></i>
+      </button>
+
+      {% if profile.rating >= 0 %}
+        <button type="button" class="btn btn-light btn-lg float-right mr-2 text-success" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+      {% else %}
+        <button type="button" class="btn btn-light btn-lg float-right mr-2 text-danger" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+      {% endif %}
+
+      <button type="button" data-toggle="button" class="btn btn-outline-success btn-lg float-right mr-2 active js-like" data-toggle="button" aria-pressed="true" autocomplete="off" data-id="{{ profile.id }}" data-content_type="Profile" data-value="1">
+        <i class="far fa-thumbs-up"></i>
+      </button>
+    {% else %}
+      <button type="button" data-toggle="button" class="btn btn-outline-danger btn-lg float-right mr-2 active js-like" data-toggle="button" aria-pressed="true" autocomplete="off" data-id="{{ profile.id }}" data-content_type="Profile" data-value="-1">
+        <i class="far fa-thumbs-down"></i>
+      </button>
+
+      {% if profile.rating >= 0 %}
+        <button type="button" class="btn btn-light btn-lg float-right mr-2 text-success" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+      {% else %}
+        <button type="button" class="btn btn-light btn-lg float-right mr-2 text-danger" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+      {% endif %}
+
+      <button type="button" data-toggle="button" class="btn btn-outline-success btn-lg float-right mr-2 js-like" data-id="{{ profile.id }}" data-content_type="Profile" data-value="1">
+        <i class="far fa-thumbs-up"></i>
+      </button>
+    {% endif %}
+
+  {% else %}
+    {% if profile.rating >= 0 %}
+      <button type="button" class="btn btn-light btn-lg float-right mr-2 text-success" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+    {% else %}
+      <button type="button" class="btn btn-light btn-lg float-right mr-2 text-danger" id="Profile_likes_count-{{ profile.id }}">{{ profile.rating }}</button>
+    {% endif %}
+  {% endif %}
+</h1>
+<hr>
+<div class="container mb-4 mt-4">
+  <ul class="nav nav-pills nav-justified" id="profileTab" role="tablist">
+    <li class="nav-item border rounded">
+      <a class="nav-link active" id="answers-tab" data-toggle="tab" href="#answers" role="tab" aria-controls="answers" aria-selected="true">Answers</a>
+    </li>
+    <li class="nav-item border rounded">
+      <a class="nav-link" id="questions-tab" data-toggle="tab" href="#questions" role="tab" aria-controls="questions" aria-selected="false">Questions</a>
+    </li>
+  </ul>
+</div>
+<div class="tab-content" id="profileTabContent">
+  <div class="tab-pane fade show active" id="answers" role="tabpanel" aria-labelledby="answers-tab">
+    {% for answer in answers %}
+      {% with question=answer.question %}
+        {% include "blog/question_template.html" %}
+      {% endwith %}
+      <div><div class="vl"></div></div>
+      {% include "blog/answer_template.html" %}
+    {% endfor %}
+  </div>
+
+  <div class="tab-pane fade" id="questions" role="tabpanel" aria-labelledby="questions-tab">
+    {% for question in questions %}
+      {% include "blog/question_template.html" %}
+    {% endfor %}
+  </div>
+</div>
 {% endblock content %}
