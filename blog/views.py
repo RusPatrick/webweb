@@ -36,7 +36,7 @@ def paginate(request, objects_list, limit):
 
 
 def index(request):
-  if request.path == '/blog/hot':
+  if request.path == '/hot':
     tab = 'hot'
     questions = Question.objects.hottest()
   else:
@@ -44,7 +44,7 @@ def index(request):
     questions = Question.objects.newest()
   page = paginate(request, questions, 20)
   context = {'questions': page.object_list, 'tab': tab, 'page': page}
-  return render(request, 'blog/post_list.html', context)
+  return render(request, 'blog/index.html', context)
 
 
 @login_required(login_url='/blog/signin')
@@ -72,7 +72,7 @@ def question(request, questionId):
       answer.question = question
       answer.save()
       page_number = answer.get_page()
-      return redirect('/blog/question/' + str(questionId) + '?page=' + str(page_number) + '#answer' + str(answer.id))
+      return redirect('/question/' + str(questionId) + '?page=' + str(page_number) + '#answer' + str(answer.id))
 
   if request.method == "GET" and request.user.is_authenticated:
     if question.is_answered_by(request.user):
